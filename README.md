@@ -1,4 +1,5 @@
-# Jinx-Ai
+# Jinx Assistant
+
 > Goals
 * Grab webpage text
 * Use gpt3 to read it, and respond

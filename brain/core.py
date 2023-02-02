@@ -1,14 +1,17 @@
 import time, os, requests
 from datetime import date
 from bs4 import BeautifulSoup
+import openai
 import logging
 
-class Grabber:
-    def __init__(self, brain):
-        self.brain = brain
+class Jinx:
+    def __init__(self):
         self.logger = logging.getLogger('brain.core.Grabber')
-        logging.basicConfig(filename=f'{date.today}.log', encoding='utf-8')
+        self.today = date.today()
+        self.today = self.today.strftime('%Y-%m-%d')
+        logging.basicConfig(filename=f'brain/log/{self.today}.log')
         self.logger.info('Grabber initialized')
+        openai.api_key = open('brain/apikey.txt', 'r').read()
 
     def get_article_cnn(url, self):
         self.url = url
@@ -22,3 +25,20 @@ class Grabber:
             self.article_text.append(p.get_text())
         self.logger.info('Parsed article text')
         return self.article_text
+
+    def GPT(prompt, engine='text-davinci-003', temp=0.7, top_p=1.0, tokens=256, freq_pen=0.0, pres_pen=0.0, stop=['<END>']):
+        prompt = prompt.encode(encoding='ASCII',errors='ignore').decode()
+        response = openai.Completion.create(
+        engine=engine,
+        prompt=prompt,
+        temperature=temp,
+        max_tokens=tokens,
+        top_p=top_p,
+        frequency_penalty=freq_pen,
+        presence_penalty=pres_pen,
+        stop=stop)
+        text = response['choices'][0]['text'].strip()
+        return text
+
+
+Jinx.__init__(Jinx)

@@ -9,10 +9,35 @@ class Jinx:
         self.logger = logging.getLogger('brain.core.Grabber')
         self.today = date.today()
         self.today = self.today.strftime('%Y-%m-%d')
-        logging.basicConfig(filename=f'brain/log/{self.today}.log')
+        self.path = os.path.dirname(os.path.abspath(__file__))
+        logging.basicConfig(filename=f'{self.path}/log/{self.today}.log')
         self.logger.info('Jinx initialized')
-        openai.api_key = open('brain/apikey.txt', 'r').read()
+        openai.api_key = open(f'{self.path}/apikey.txt', 'r').read()
 
+    def get_article(url, self):
+        self.url = url
+        self.article = requests.get(self.url)
+        self.logger = logging.getLogger('brain.core.Jinx')
+        self.logger.info(f'Grabbed article from {self.url}')
+        self.soup = BeautifulSoup(self.article.text, 'html.parser')
+        if "www.cnn.com" in self.url:
+            self.article_body = self.soup.find('div', class_='article__content')
+        elif "www.foxnews.com" in self.url:
+            self.article_body = self.soup.find('div', class_='article-content')
+        elif "medium.com" in self.url:
+            self.article_body = self.soup.find('div', class_='pw-post-body-paragraph')
+        else:
+            print('Invalid url')
+            exit()
+        self.article_text = []
+        for p in self.article_body.find_all('p'):
+            self.article_text.append(p.get_text())
+        self.logger.info('Parsed article text')
+        return self.article_text
+    
+    
+    
+    
     def get_article_cnn(url, self):
         self.url = url
         self.article = requests.get(self.url)
@@ -33,6 +58,19 @@ class Jinx:
         self.logger.info(f'Grabbed article from {self.url}')
         self.soup = BeautifulSoup(self.article.text, 'html.parser')
         self.article_body = self.soup.find('div', class_='article-content')
+        self.article_text = []
+        for p in self.article_body.find_all('p'):
+            self.article_text.append(p.get_text())
+        self.logger.info('Parsed article text')
+        return self.article_text
+    
+    def get_article_medium(url, self):
+        self.url = url
+        self.article = requests.get(self.url)
+        self.logger = logging.getLogger('brain.core.Jinx')
+        self.logger.info(f'Grabbed article from {self.url}')
+        self.soup = BeautifulSoup(self.article.text, 'html.parser')
+        self.article_body = self.soup.find('div', class_='pw-post-body-paragraph')
         self.article_text = []
         for p in self.article_body.find_all('p'):
             self.article_text.append(p.get_text())

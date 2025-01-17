@@ -1,4 +1,4 @@
-# Jinx Assistant
+# Jinx Assistant - unfinished and depreciated
 
 > Goals
 * Grab webpage text
